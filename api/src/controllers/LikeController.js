@@ -6,19 +6,18 @@ module.exports = {
     const { user } = req.headers
 
     const loggedDev = await Dev.findById(user)
-
     const targetDev = await Dev.findById(devId)
 
     if (!targetDev) {
-      return res.status(400).json({
-        error: 'Dev is not exists.'
-      })
+      return res.status(400).json({ error: 'Dev is not exists.' })
     }
 
+    if (targetDev.likes.includes(loggedDev._id)) console.log('DEU MATCH')
 
+    loggedDev.likes.push(targetDev._id)
 
-    return res.json({
-      ok: 'true'
-    })
+    await loggedDev.save()
+
+    return res.json(loggedDev)
   }
 }
