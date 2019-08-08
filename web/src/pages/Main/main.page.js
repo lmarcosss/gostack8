@@ -1,78 +1,90 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+
+import { Link } from 'react-router-dom'
 
 import { logo, like, dislike } from '../../assets'
 
-export function Main({ match }) {
-  return <div className="main-container">
-    <img src={logo} alt="logo" />
-    <ul>
-      <li>
-        <img src="https://avatars1.githubusercontent.com/u/32651857?s=460&v=4" alt="avatar" />
-        <footer>
-          <strong>Leonardo Marcos</strong>
-          <p>I love react, javascript and learn other programming languages. I believe which if you learn the logic, after that you can learn any language.</p>
-        </footer>
-        <div className="actions">
-          <button type="button">
-            <img src={like} alt="like" />
-          </button>
-          <button type="button">
-            <img src={dislike} alt="dislike" />
-          </button>
+import { DevService } from '../../services'
 
-        </div>
-      </li>
+import './main.style.css'
 
-      <li>
-        <img src="https://avatars1.githubusercontent.com/u/32651857?s=460&v=4" alt="avatar" />
-        <footer>
-          <strong>Leonardo Marcos</strong>
-          <p>I love react, javascript and learn other programming languages. I believe which if you learn the logic, after that you can learn any language.</p>
-        </footer>
-        <div className="actions">
-          <button type="button">
-            <img src={like} alt="like" />
-          </button>
-          <button type="button">
-            <img src={dislike} alt="dislike" />
-          </button>
+const devSevice = new DevService()
 
-        </div>
-      </li>
 
-      <li>
-        <img src="https://avatars1.githubusercontent.com/u/32651857?s=460&v=4" alt="avatar" />
-        <footer>
-          <strong>Leonardo Marcos</strong>
-          <p>I love react, javascript and learn other programming languages. I believe which if you learn the logic, after that you can learn any language.</p>
-        </footer>
-        <div className="actions">
-          <button type="button">
-            <img src={like} alt="like" />
-          </button>
-          <button type="button">
-            <img src={dislike} alt="dislike" />
-          </button>
+function CardUser({ user, handleLike, handleDislike }) {
+  const { name, bio, avatar } = user
 
-        </div>
-      </li>
-
-      <li>
-        <img src="https://avatars1.githubusercontent.com/u/32651857?s=460&v=4" alt="avatar" />
-        <footer>
-          <strong>Leonardo Marcos</strong>
-          <p>I love react, javascript and learn other programming languages. I believe which if you learn the logic, after that you can learn any language.</p>
-        </footer>
-        <div className="actions">
-          <button type="button">
-            <img src={like} alt="like" />
-          </button>
-          <button type="button">
-            <img src={dislike} alt="dislike" />
-          </button>
-
-        </div>
-      </li>
-    </ul>
-  </div>
+  return (
+    <li>
+      <img src={avatar} alt="avatar" />
+      <footer>
+        <strong>{name}</strong>
+        <p>{bio}</p>
+      </footer>
+      <div className="actions">
+        <button type="button" onClick={() => handleLike(user._id)}>
+          <img src={like} alt="like" />
+        </button>
+        <button type="button">
+          <img src={dislike} alt="dislike" onClick={() => handleDislike(user._id)} />
+        </button>
+      </div>
+    </li>
+  )
 }
+
+function Users({ users, handleLike, handleDislike }) {
+  return users.map((user, index) => {
+    return (
+      <CardUser
+        key={index}
+        user={user}
+        handleLike={handleLike}
+        handleDislike={handleDislike}
+      />
+    )
+  })
+}
+
+export function Main({ match }) {
+  const [users, setUsers] = useState([])
+
+  useEffect(() => {
+    async function loadUsers() {
+      const userId = match.params.id
+
+      const { data } = await devSevice.getDevs(userId)
+
+      setUsers(data)
+    }
+
+    loadUsers()
+  }, [match.params.id])
+
+
+  async function handleLike(id) {
+    await devSevice.likeDev(id, match.params.id)
+  }
+
+  async function handleDislike(id) {
+    await devSevice.dislikeDev(id, match.params.id)
+  }
+
+  return <div className="main-container">
+    <Link to="/">
+      <img src={logo} alt="logo" />
+    </Link>
+    {users.length > 0 ?
+      <ul>
+        <Users
+          users={users}
+          handleLike={handleLike}
+          handleDislike={handleDislike}
+        />
+      </ul>
+      : (
+        <div className="empty">Acabou :(</div>
+      )
+    }
+  </div>
+} 

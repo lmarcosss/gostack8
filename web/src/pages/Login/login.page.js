@@ -2,9 +2,11 @@ import React, { useState } from 'react'
 
 import { logo } from '../../assets'
 
-import api from '../../services/api'
+import { DevService } from '../../services'
 
 import './login.style.css'
+
+const devService = new DevService()
 
 export function Login({ history }) {
   const [username, setUsername] = useState('')
@@ -13,13 +15,9 @@ export function Login({ history }) {
   async function handleSubmit(e) {
     e.preventDefault()
 
-    const response = await api.post('/devs', { username })
+    const { data } = await devService.createDev(username)
 
-    const { _id } = response.data
-
-    console.log(response.data)
-
-    history.push(`/devs/${_id}`)
+    history.push(`/devs/${data._id}`)
   }
 
   return (
