@@ -75,5 +75,44 @@ export default style = StyleSheet.create({
     color: '#999',
     fontSize: 24,
     fontWeight: 'bold'
+  },
+  matchContainer: {
+    ...StyleSheet.absoluteFillObject,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    elevation: 3
+  },
+  matchImage: {
+    height: 60,
+    resizeMode: 'contain',
+  },
+  matchAvatar: {
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    borderWidth: 5,
+    borderColor: '#fff',
+    marginVertical: 30
+  },
+  matchName: {
+    fontSize: 32,
+    color: '#fff'
+  },
+  matchBio: {
+    marginTop: 10,
+    fontSize: 16,
+    lineHeight: 24,
+    paddingHorizontal: 30,
+    textAlign: 'center',
+    color: 'rgba(255, 255, 255, 0.8)',
+  },
+  buttonClose: {
+    marginTop: 30,
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 16,
+    textAlign: 'center'
   }
+
 })

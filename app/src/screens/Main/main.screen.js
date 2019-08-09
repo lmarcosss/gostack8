@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react'
-import { View, SafeAreaView, Image, Text } from 'react-native'
+import { View, SafeAreaView, Image, Text, TouchableOpacity } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage'
+import io from 'socket.io-client'
 
-import { logo, like, dislike } from '../../assets'
+import { logo, like, dislike, itsamatch } from '../../assets'
 
 import { DevService } from '../../services'
 
 import style from './main.style'
-import { TouchableOpacity } from 'react-native-gesture-handler';
 
 export function MainScreen({ navigation }) {
   const loggedUser = navigation.getParam('user')
   const [users, setUsers] = useState([])
+  const [matchDev, setMatchDev] = useState(null)
 
   useEffect(() => {
     async function loadUsers() {
@@ -25,12 +26,21 @@ export function MainScreen({ navigation }) {
   }, [loggedUser])
 
 
+  useEffect(() => {
+    const socket = io('http://localhost:3333', {
+      query: { user: loggedUser }
+    })
+
+    socket.on('match', dev => {
+      setMatchDev(dev)
+    })
+
+  }, [loggedUser])
+
+
   async function handleLike() {
     const [{ _id }, ...rest] = users
-    debugger
     await DevService.likeDev(_id, loggedUser)
-
-
 
     setUsers(rest)
   }
@@ -65,6 +75,33 @@ export function MainScreen({ navigation }) {
     })
   }
 
+  function renderActions() {
+    return (
+      <View style={style.actionsContainer}>
+        <TouchableOpacity onPress={handleDislike} style={style.button}>
+          <Image source={dislike} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleLike} style={style.button}>
+          <Image source={like} />
+        </TouchableOpacity>
+      </View>
+    )
+  }
+
+  function renderMatch() {
+    return (
+      <View style={style.matchContainer}>
+        <Image style={style.matchImage} source={itsamatch} />
+        <Image style={style.matchAvatar} source={{ uri: matchDev.avatar }} />
+        <Text style={style.matchName} >{matchDev.name}</Text>
+        <Text style={style.matchBio} >{matchDev.bio}</Text>
+        <TouchableOpacity onPress={() => setMatchDev(null)}>
+          <Text style={style.buttonClose}>FECHAR</Text>
+        </TouchableOpacity>
+      </View>
+    )
+  }
+
 
 
   return (
@@ -76,14 +113,10 @@ export function MainScreen({ navigation }) {
         {users.length > 0 ? renderCards() : <Text style={style.empty}>Acabou :(</Text>}
       </View>
 
-      <View style={style.actionsContainer}>
-        <TouchableOpacity onPress={handleDislike} style={style.button}>
-          <Image source={dislike} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleLike} style={style.button}>
-          <Image source={like} />
-        </TouchableOpacity>
-      </View>
+      {renderActions()}
+
+      {matchDev && renderMatch()}
+
     </SafeAreaView>
   )
 }

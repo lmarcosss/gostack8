@@ -23,11 +23,11 @@ function CardUser({ user, handleLike, handleDislike }) {
         <p>{bio}</p>
       </footer>
       <div className="actions">
-        <button type="button" onClick={() => handleLike(user._id)}>
-          <img src={like} alt="like" />
-        </button>
         <button type="button">
           <img src={dislike} alt="dislike" onClick={() => handleDislike(user._id)} />
+        </button>
+        <button type="button" onClick={() => handleLike(user._id)}>
+          <img src={like} alt="like" />
         </button>
       </div>
     </li>
